@@ -1,28 +1,37 @@
-import { Layout } from "../components/Layout";
-import { Box, TextField, Button, Typography, Alert } from "@mui/material";
-import { useState } from "react";
-import { useSearch } from "../hooks/useSearch";
-import { useStream } from "../hooks/useStream";
-import SearchResult from "../components/SearchResult";
-import VideoPlayer from "../components/VideoPlayer";
-import Loader from "../components/Loader";
-import type { SearchItem } from "../components/SearchResultItem";
+import { Box, Alert } from "@mui/material";
+import { Layout } from "../shared/components/Layout";
+import { useStream } from "../features/player/hooks/useStream";
+import SearchResult from "../features/search/components/SearchResult";
+import VideoPlayerDialog from "../features/player/components/VideoPlayerDialog";
+import Loader from "../shared/components/Loader";
+import EmptySearchMessage from "../features/search/components/EmptySearchMessage";
+import type { SearchItem } from "../features/search/components/SearchResultItem";
+import { useSearchContext } from "../features/search/context/SearchContext";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const { search, results, loading, error } = useSearch();
+  const { results, loading, error, search, reset, query, setQuery } = useSearchContext();
+  const { currentVideo, videoUrl, selectVideo, reset: resetPlayer } = useStream();
+  const location = useLocation();
+  const prevPath = useRef(location.pathname);
 
-  const {
-    currentVideo,
-    videoUrl,
-    selectVideo,
-    reset: resetVideo,
-  } = useStream();
+  const handleInputChange = (value: string) => {
+    setQuery(value);
+    if (value.trim() === "") {
+      reset();
+      resetPlayer();
+    }
+  };
 
-  const handleSearch = async () => {
-    resetVideo();
-    if (query.trim()) {
-      await search(query);
+  const handleSearch = (value: string) => {
+    const trimmed = value.trim();
+    setQuery(trimmed);
+    resetPlayer();
+    if (trimmed) {
+      search(trimmed);
+    } else {
+      reset();
     }
   };
 
@@ -30,39 +39,43 @@ export default function Home() {
     selectVideo(item);
   };
 
+  useEffect(() => {
+    if (
+      location.pathname === "/" &&
+      prevPath.current !== "/" &&
+      query.trim()
+    ) {
+      search(query.trim());
+    }
+    prevPath.current = location.pathname;
+  }, [location.pathname, query, search]);
+
+  const noResults = !loading && !error && results.length === 0;
+  const showPlaceholder = query === "" && noResults;
+  const showNotFound = query !== "" && noResults;
+
   return (
-    <Layout>
-      <Typography variant='h4' align='center' gutterBottom>
-        🎤 Karaoke Search
-      </Typography>
+    <Layout onSearch={handleSearch} onInputChange={handleInputChange}>
+      <Box mt={4}>
+        {loading && <Loader />}
+        {error && <Alert severity="error">{error}</Alert>}
+        {!loading && results.length > 0 && (
+          <SearchResult results={results} onSelect={handleSelect} />
+        )}
 
-      <Box display='flex' gap={2} mt={3} mb={4}>
-        <TextField
-          fullWidth
-          placeholder='Песня или артист'
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+        <EmptySearchMessage
+          show={noResults}
+          placeholder={showPlaceholder}
+          notFound={showNotFound}
         />
-        <Button variant='contained' onClick={handleSearch} disabled={loading}>
-          Найти
-        </Button>
+
+        <VideoPlayerDialog
+          open={Boolean(currentVideo && videoUrl)}
+          video={currentVideo}
+          src={videoUrl}
+          onClose={resetPlayer}
+        />
       </Box>
-
-      {loading && <Loader />}
-
-      {error && (
-        <Box mt={2}>
-          <Alert severity='error'>{error}</Alert>
-        </Box>
-      )}
-
-      {!loading && <SearchResult results={results} onSelect={handleSelect} />}
-
-      {currentVideo && videoUrl && (
-        <Box mt={4}>
-          <VideoPlayer video={currentVideo} src={videoUrl} />
-        </Box>
-      )}
     </Layout>
   );
 }

@@ -1,0 +1,172 @@
+basePath: /api/v1
+definitions:
+  models.ErrorRes:
+    properties:
+      message:
+        example: internal server error
+        type: string
+    type: object
+  models.FavoriteReq:
+    properties:
+      channel:
+        type: string
+      title:
+        type: string
+      videoId:
+        type: string
+    type: object
+  models.FavoriteRes:
+    properties:
+      channel:
+        type: string
+      createdAt:
+        type: string
+      title:
+        type: string
+      userId:
+        type: string
+      videoId:
+        type: string
+    type: object
+  models.KaraokeRes:
+    properties:
+      channel:
+        type: string
+      thumbnail:
+        type: string
+      title:
+        type: string
+      videoId:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Backend for Karaoke web app.
+  title: Karaoke API
+  version: "1.0"
+paths:
+  /favorites:
+    get:
+      parameters:
+      - description: Filter by channel
+        in: query
+        name: channel
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.FavoriteRes'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+      summary: List favorites
+      tags:
+      - Favorites
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Favorite data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FavoriteReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.FavoriteRes'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+      summary: Add a favorite
+      tags:
+      - Favorites
+  /favorites/{videoId}:
+    delete:
+      parameters:
+      - description: YouTube Video ID
+        in: path
+        name: videoId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+      summary: Delete favorite by videoId
+      tags:
+      - Favorites
+  /search:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.KaraokeRes'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+      summary: Search karaoke songs
+      tags:
+      - Search
+  /stream/{videoId}:
+    get:
+      parameters:
+      - description: YouTube Video ID
+        in: path
+        name: videoId
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorRes'
+      summary: Stream video by videoId
+      tags:
+      - Stream
+swagger: "2.0"

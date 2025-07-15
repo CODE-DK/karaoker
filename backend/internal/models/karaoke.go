@@ -1,6 +1,6 @@
 package models
 
-type KaraokeResult struct {
+type KaraokeRes struct {
 	Title     string `json:"title"`
 	VideoID   string `json:"videoId"`
 	Thumbnail string `json:"thumbnail"`

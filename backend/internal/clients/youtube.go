@@ -23,7 +23,7 @@ const (
 	youtubeBaseUrl = "https://www.googleapis.com/youtube/v3/search"
 )
 
-func FetchYouTubeSearchResults(ctx context.Context, query string) ([]models.KaraokeResult, error) {
+func FetchYouTubeSearch(ctx context.Context, query string) ([]models.KaraokeRes, error) {
 	rid := middleware.ExtractRequestID(ctx)
 
 	apiKey := os.Getenv("YOUTUBE_API_KEY")
@@ -62,15 +62,15 @@ func FetchYouTubeSearchResults(ctx context.Context, query string) ([]models.Kara
 		return nil, err
 	}
 
-	var ytResp models.YouTubeSearchResponse
+	var ytResp models.YouTubeSearchRes
 	if err := json.Unmarshal(body, &ytResp); err != nil {
 		log.Printf("[YouTube] [RID: %s] JSON parse error: %v", rid, err)
 		return nil, err
 	}
 
-	results := make([]models.KaraokeResult, 0, len(ytResp.Items))
+	results := make([]models.KaraokeRes, 0, len(ytResp.Items))
 	for _, item := range ytResp.Items {
-		results = append(results, models.KaraokeResult{
+		results = append(results, models.KaraokeRes{
 			Title:     item.Snippet.Title,
 			VideoID:   item.ID.VideoID,
 			Thumbnail: item.Snippet.Thumbnails.Medium.URL,

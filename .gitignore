@@ -1,0 +1,71 @@
+# Node.js
+node_modules/
+dist/
+dist-ssr/
+*.local
+.yarn/*
+.pnpm-store/
+.npm/
+.yarnrc.yml
+.yarnclean
+.npmrc
+
+# Vite / Build
+.vite/
+build/
+*.log
+
+# Yarn / npm / pnpm logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# .env files
+.env
+.env.*.local
+
+# Firebase config
+firebase-config.json
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Editor / OS files
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Go
+*.out
+*.test
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.o
+
+# Go build cache and binaries
+/go.sum
+/go.mod
+/backend/internal/scripts/bin/
+coverage.out
+
+# Docker
+docker-compose.override.yml
+.volume/
+
+# Misc
+*.bak
+*.tmp
+*.temp

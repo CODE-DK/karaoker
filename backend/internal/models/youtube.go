@@ -1,6 +1,6 @@
 package models
 
-type YouTubeSearchResponse struct {
+type YouTubeSearchRes struct {
 	Items []YouTubeSearchItem `json:"items"`
 }
 

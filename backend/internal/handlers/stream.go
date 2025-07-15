@@ -4,13 +4,24 @@ import (
 	"log"
 	"os/exec"
 
+	"github.com/dkom/karaoke/internal/models"
 	"github.com/gofiber/fiber/v2"
 )
 
+// StreamYouTube godoc
+// @Summary Stream video by videoId
+// @Tags Stream
+// @Produce octet-stream
+// @Param videoId path string true "YouTube Video ID"
+// @Success 200 {file} file
+// @Failure 500 {object} models.ErrorRes
+// @Router /stream/{videoId} [get]
 func StreamYouTube(c *fiber.Ctx) error {
 	videoID := c.Params("videoId")
 	if videoID == "" {
-		return c.Status(fiber.StatusBadRequest).SendString("Missing videoId")
+		return c.Status(fiber.StatusBadRequest).JSON(models.ErrorRes{
+			Message: "Missing videoId",
+		})
 	}
 
 	args := []string{
@@ -25,11 +36,15 @@ func StreamYouTube(c *fiber.Ctx) error {
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Printf("[stream] yt-dlp pipe failed: %v", err)
-		return c.Status(fiber.StatusInternalServerError).SendString("yt-dlp pipe error")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorRes{
+			Message: "yt-dlp pipe error",
+		})
 	}
 	if err := cmd.Start(); err != nil {
 		log.Printf("[stream] yt-dlp start failed: %v", err)
-		return c.Status(fiber.StatusInternalServerError).SendString("yt-dlp start error")
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorRes{
+			Message: "yt-dlp start error",
+		})
 	}
 
 	c.Set("Content-Type", "video/mp4")

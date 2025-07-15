@@ -1,0 +1,27 @@
+language: "en-US"
+
+reviews:
+  profile: "chill"
+  auto_review:
+    enabled: true
+    trigger: all
+
+ci:
+  provider: github
+  required_checks:
+    - build
+
+path_filters:
+  - "!**/*.lock"
+  - "!**/node_modules/**"
+  - "!**/dist/**"
+  - "!**/vendor/**"
+
+path_instructions:
+  - path: "frontend/**/*.{ts,tsx}"
+    instructions: |
+      Review React and TypeScript code for correctness, clarity, performance, and maintainability. Watch for type safety, unnecessary re-renders, and accessibility issues.
+
+  - path: "backend/**/*.go"
+    instructions: |
+      Review Go code for idiomatic structure, performance, error handling, and clarity. Follow best practices from Effective Go and Go Proverbs.

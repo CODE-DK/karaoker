@@ -11,7 +11,7 @@ import (
 )
 
 type cacheItem struct {
-	results    []models.KaraokeResult
+	results    []models.KaraokeRes
 	expiration time.Time
 }
 
@@ -21,12 +21,20 @@ var (
 	cacheTTL  = 5 * time.Minute
 )
 
+// SearchSong godoc
+// @Summary Search karaoke songs
+// @Tags Search
+// @Produce json
+// @Param query query string true "Search query"
+// @Success 200 {array} models.KaraokeRes
+// @Failure 500 {object} models.ErrorRes
+// @Router /search [get]
 func SearchSong(c *fiber.Ctx) error {
 	query := c.Query("q")
 	if query == "" {
 		log.Println("[SearchSong] ❌ Missing 'q' query param")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Query parameter 'q' is required",
+		return c.Status(fiber.StatusBadRequest).JSON(models.ErrorRes{
+			Message: "Query parameter 'q' is required",
 		})
 	}
 
@@ -43,11 +51,11 @@ func SearchSong(c *fiber.Ctx) error {
 
 	log.Printf("[SearchSong] ⏳ Запрашиваем с YouTube API")
 
-	results, err := clients.FetchYouTubeSearchResults(c.UserContext(), query)
+	results, err := clients.FetchYouTubeSearch(c.UserContext(), query)
 	if err != nil {
 		log.Printf("[SearchSong] ❌ Ошибка YouTube API: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorRes{
+			Message: err.Error(),
 		})
 	}
 

@@ -1,0 +1,10 @@
+{
+  "auth/invalid-credential": "Неверный email или пароль.",
+  "auth/user-not-found": "Пользователь не найден.",
+  "auth/wrong-password": "Неверный пароль.",
+  "auth/invalid-email": "Невалидный email.",
+  "auth/too-many-requests": "Слишком много попыток. Попробуйте позже.",
+  "auth/email-already-in-use": "Email уже зарегистрирован.",
+  "auth/weak-password": "Пароль слишком простой.",
+  "default": "Произошла ошибка. Попробуйте ещё раз."
+}
